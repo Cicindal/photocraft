@@ -60,6 +60,7 @@ fn print_fields(app: &mut PhotocraftApp, id: DialogId) -> &mut DialogFields {
 #[cfg(windows)]
 #[test]
 fn print_dialog_keeps_saved_settings_when_the_cached_printer_list_is_empty() {
+    use craft::ui::dialog::StackDialog;
     use std::sync::atomic::{AtomicBool, Ordering};
     let mut app = app();
     let ctx = app.ctx().clone();
@@ -89,15 +90,19 @@ fn print_dialog_keeps_saved_settings_when_the_cached_printer_list_is_empty() {
     });
     held.recv().unwrap();
     let id = open_print(&mut app);
-    let fields = print_fields(&mut app, id);
-    assert_eq!((field(fields, "printer"), field(fields, "printerSettings")), (json!("Saved printer"), json!("0011")));
+    let assert_saved_settings = |app: &PhotocraftApp| {
+        let dialog = app.framework.dialogs.get_by_id::<HostedPrint>(id).expect("Print is open");
+        let fields = dialog.json_fields().expect("Print exposes its settings");
+        assert_eq!(fields["printer"], "Saved printer");
+        assert_eq!(fields["printerSettings"], "0011");
+    };
+    assert_saved_settings(&app);
     let _ = release.send(());
     holder.join().unwrap();
     photocraft_engine::print_cmds::with_spooler(|| {
         pass(&mut app);
         take(&mut app, &ctx);
-        let fields = print_fields(&mut app, id);
-        assert_eq!((field(fields, "printer"), field(fields, "printerSettings")), (json!("Saved printer"), json!("0011")));
+        assert_saved_settings(&app);
     });
 }
 

@@ -2,6 +2,7 @@
 use craft::automation::actions::ActionStep;
 use craft::automation::ui::actions::ActionSelection;
 use craft::ui::dialog::DialogId;
+use craft::ui::runtime::env::Env;
 use craft::ui::runtime::memory::{saved_value, set_saved_value};
 use egui_kittest::{
     Harness,
@@ -177,11 +178,13 @@ fn names(h: &Harness<'static, PhotocraftApp>) -> Vec<String> {
 
 /// Type into the actual Levels gamma control and blur it to commit the value.
 fn edit_gamma(h: &mut Harness<'static, PhotocraftApp>, gamma: &str) {
-    h.get_by_label("Gamma").click();
+    // The histogram thumb and the numeric field share this accessible label.
+    h.get_by_role_and_label(egui::accesskit::Role::SpinButton, "Gamma").click();
     h.run_steps(2);
     h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
     h.run_steps(1);
-    h.event(egui::Event::Text(gamma.into()));
+    let decimal = Env::of_root(&h.ctx).format().separators().0;
+    h.event(egui::Event::Text(gamma.replace('.', &decimal.to_string())));
     h.run_steps(1);
     h.get_by_label("Preview").click();
     h.run_steps(2);

@@ -54,7 +54,8 @@ fn assert_no_system_listing() {
 fn show(ui: &mut egui::Ui, app: &mut PhotocraftApp) {
     crate::dialogs::run(app, ui);
     let ctx = ui.ctx().clone();
-    super::take(app, &ctx);
+    // Resolve the simulated printer list even if another test is using the spooler lock.
+    photocraft_engine::print_cmds::with_spooler(|| super::take(app, &ctx));
 }
 
 fn harness(app: PhotocraftApp) -> Harness<'static, PhotocraftApp> {
@@ -129,7 +130,7 @@ fn enter_length(h: &mut Harness<'_, PhotocraftApp>, label: &str, value: &str) {
     h.event(Event::PointerButton { pos, button: PointerButton::Primary, pressed: false, modifiers: Modifiers::NONE });
     h.run_steps(1);
     h.key_press_modifiers(Modifiers::COMMAND, Key::A);
-    h.event(Event::Text(value.into()));
+    h.event(Event::Text(crate::testing::decimal_input(&h.ctx, value)));
     h.run_steps(1);
     h.key_press(Key::Tab);
     h.run_steps(3);

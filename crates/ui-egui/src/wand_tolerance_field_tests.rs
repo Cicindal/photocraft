@@ -43,7 +43,7 @@ fn type_tolerance(h: &mut Harness<'_, PhotocraftApp>, text: &str) -> f32 {
     h.get_by_role(Role::SpinButton).click();
     h.run();
     h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
-    h.event(egui::Event::Text(text.into()));
+    h.event(egui::Event::Text(crate::testing::decimal_input(&h.ctx, text)));
     h.run_steps(2);
     h.key_press(egui::Key::Enter);
     h.run_steps(2);

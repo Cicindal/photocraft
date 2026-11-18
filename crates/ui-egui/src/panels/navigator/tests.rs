@@ -32,13 +32,11 @@ fn whole_app(animated_zoom: bool) -> Harness<'static, PhotocraftApp> {
     h
 }
 
-/// The percentages the fields named Zoom show.
-// PLAN: assumes the Navigator's zoom field and the status bar's carry the accessible name "Zoom" and show the
-// percentage as their value (the framework's `NavigatorZoomRow` words are not in this tree).
-fn percents(h: &Harness<'static, PhotocraftApp>) -> Vec<f32> {
+/// The numeric percentages exposed by the accessible zoom fields, independent of number formatting.
+fn percents(h: &Harness<'static, PhotocraftApp>) -> Vec<f64> {
     h.get_all_by_label("Zoom")
-        .filter_map(|node| node.accesskit_node().value())
-        .filter_map(|value| value.trim().trim_end_matches('%').trim().parse::<f32>().ok())
+        .filter(|node| node.accesskit_node().role() == egui::accesskit::Role::SpinButton)
+        .filter_map(|node| node.accesskit_node().numeric_value())
         .collect()
 }
 

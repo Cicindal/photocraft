@@ -43,7 +43,7 @@ fn type_into(h: &mut Harness<'static, PhotocraftApp>, name: &str, text: &str) {
         .click();
     h.run_steps(1);
     h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
-    h.event(egui::Event::Text(text.into()));
+    h.event(egui::Event::Text(crate::testing::decimal_input(&h.ctx, text)));
     h.run_steps(1);
     h.key_press(egui::Key::Enter);
     h.run_steps(3);

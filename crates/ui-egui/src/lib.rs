@@ -739,6 +739,12 @@ pub(crate) mod testing {
     /// The folder of the scratch settings store; its file lives in `files`.
     const DIR: &str = "/memory/photocraft";
 
+    /// Converts a decimal fixture to the number format used by the UI under test.
+    pub(crate) fn decimal_input(ctx: &egui::Context, text: &str) -> String {
+        let decimal = craft::ui::runtime::env::Env::of_root(ctx).format().separators().0;
+        text.replace('.', &decimal.to_string())
+    }
+
     /// Services whose preferences store reads and writes `files`, so a second app over the same files reads what the
     /// first one stored. A zero debounce makes the first frame after a change write it.
     pub(crate) fn services_over(files: &Arc<MemoryFiles>) -> Services {

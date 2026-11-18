@@ -27,7 +27,7 @@ fn type_radius(h: &mut Harness<'static, PhotocraftApp>, text: &str) {
     h.query_all_by_role(Role::SpinButton).find(|n| n.accesskit_node().label().as_deref() == Some("Radius")).expect("the Radius field").click();
     h.run_steps(1);
     h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
-    h.event(egui::Event::Text(text.into()));
+    h.event(egui::Event::Text(crate::testing::decimal_input(&h.ctx, text)));
     h.run_steps(1);
     h.key_press(egui::Key::Tab);
     h.run_steps(3);
